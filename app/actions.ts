@@ -13,7 +13,7 @@ import { object } from "zod";
 import { revalidatePath } from "next/cache";
 import { nylas } from "./lib/nylas";
 import { error } from "console";
-// import nylas from "nylas";
+
 
 // Onboarding Action
 export async function onboardingAction(prevState: any, formData: FormData) {
@@ -311,6 +311,56 @@ const availabilityData=Object.keys(rawData).filter((key)=> key.startsWith("id-")
         url: submission.value.url,
         description: submission.value.description,
         videoCallSoftware: submission.value.vedioCallSoftware,
+      },
+    });
+  
+    return redirect("/dashboard");
+  }
+
+  export async function UpdateEventTypeStatusAction(
+    prevState: any,
+    {
+      eventTypeId,
+      isChecked,
+    }: {
+      eventTypeId: string;
+      isChecked: boolean;
+    }
+  ) {
+    try {
+      const session = await requireUser();
+  
+      const data = await prisma.eventType.update({
+        where: {
+          id: eventTypeId,
+          userId: session.user?.id as string,
+        },
+        data: {
+          active: isChecked,
+        },
+      });
+  
+      revalidatePath(`/dashboard`);
+      return {
+        status: "success",
+        message: "EventType Status updated successfully",
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        message: "Something went wrong",
+      };
+    }
+  }
+
+  
+  export async function DeleteEventTypeAction(formData: FormData) {
+    const session = await requireUser();
+  
+    const data = await prisma.eventType.delete({
+      where: {
+        id: formData.get("id") as string,
+        userId: session.user?.id,
       },
     });
   

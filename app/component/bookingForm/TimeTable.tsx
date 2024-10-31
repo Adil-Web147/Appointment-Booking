@@ -1,3 +1,4 @@
+
 import prisma from "@/app/lib/db";
 import { nylas } from "@/app/lib/nylas";
 import { Button } from "@/components/ui/button";
@@ -124,8 +125,6 @@ export async function TimeTable({
 }: iAppProps) {
   const { data, nylasCalendarData } = await getData(userName, selectedDate);
 
-
-
   const formattedDate = format(selectedDate, "yyyy-MM-dd");
   const dbAvailablity = {
     fromTime: data?.fromTime,
@@ -141,7 +140,6 @@ export async function TimeTable({
 
   return (
     <div>
-      
       <p className="text-base font-semibold">
         {format(selectedDate, "EEE")}{" "}
         <span className="text-sm text-muted-foreground">

@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CopyLinkMenuItem } from "../component/CopyLinkMenu";
+import { MenuActiveSwitch } from "../component/EventTypeSwitcher";
 
 async function getData(userId: string) {
   try {
@@ -123,9 +124,11 @@ export default async function DashboardPage() {
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/event/${item.id}/delete`}>
                         <Trash className="mr-2 size-4" />
                         Delete
+                        </Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -145,8 +148,12 @@ export default async function DashboardPage() {
                   </div>
                 </Link>
                 <div className="bg-muted px-5 py-3 justify-between items-center flex">
-                  <Switch />
-                  <Button>Edit Event</Button>
+                  <MenuActiveSwitch initalChecked={item.active} eventTypeId={item.id}/>
+                  <Button asChild>
+                    <Link href={`/dashboard/event/${item.id}`}>
+                    Edit Event
+                    </Link>
+                  </Button>
                 </div>
               </div>
             ))}
