@@ -1,7 +1,21 @@
 {
   "compilerOptions": {
+    "jsx": "react-jsx", // Use 'react-jsx' for React 17+ and Next.js
+    "baseUrl": ".", // Ensures imports use the root directory
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"] // Use the alias @ for easier imports
     }
-  }
+  },
+  "include": [
+    "pages/**/*.js", // Include all JavaScript files in the pages directory
+    "components/**/*.js", // Include all JavaScript files in components directory
+    "app/**/*.js", // Include files from app directory if applicable
+    "lib/**/*.js", // Include files from lib directory if applicable
+    "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.json" // Other TypeScript and JSON files
+  ],
+  "exclude": [
+    "node_modules", // Exclude node_modules
+    ".next", // Exclude Next.js build output directory
+    "public" // Exclude public directory
+  ]
 }
