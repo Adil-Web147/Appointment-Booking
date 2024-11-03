@@ -1,8 +1,6 @@
-
 import prisma from "@/app/lib/db";
 import { nylas } from "@/app/lib/nylas";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Prisma } from "@prisma/client";
 import {
   addMinutes,
@@ -12,24 +10,29 @@ import {
   isBefore,
   parse,
 } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import Link from "next/link";
-import { GetFreeBusyRequest, GetFreeBusyResponse, NylasResponse } from "nylas";
+import { GetFreeBusyResponse, NylasResponse } from "nylas";
+
+const timeZone = "Asia/Karachi";
 
 async function getData(userName: string, selectedDate: Date) {
-  const currentDay = format(selectedDate, "EEEE");
+  const zonedSelectedDate = toZonedTime(selectedDate, timeZone);
+  const currentDay = format(zonedSelectedDate, "EEEE");
 
-  const startOfDay = new Date(selectedDate);
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date(selectedDate);
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = toZonedTime(
+    new Date(zonedSelectedDate.setHours(0, 0, 0, 0)),
+    timeZone
+  );
+  const endOfDay = toZonedTime(
+    new Date(zonedSelectedDate.setHours(23, 59, 59, 999)),
+    timeZone
+  );
 
   const data = await prisma.availability.findFirst({
     where: {
       day: currentDay as Prisma.EnumDayFilter,
-      User: {
-        userName: userName,
-      },
+      User: { userName: userName },
     },
     select: {
       fromTime: true,
@@ -45,11 +48,11 @@ async function getData(userName: string, selectedDate: Date) {
   });
 
   const nylasCalendarData = await nylas.calendars.getFreeBusy({
-    identifier: data?.User?.grantId as string,
+    identifier: data?.User?.grantId || "",
     requestBody: {
       startTime: Math.floor(startOfDay.getTime() / 1000),
       endTime: Math.floor(endOfDay.getTime() / 1000),
-      emails: [data?.User?.grantEmail as string],
+      emails: [data?.User?.grantEmail || ""],
     },
   });
 
@@ -65,9 +68,9 @@ interface iAppProps {
   duration: number;
 }
 
-function calucalteAvailableTimeSlots(
+function calculateAvailableTimeSlots(
   date: string,
-  dbAvailablity: {
+  dbAvailability: {
     fromTime: string | undefined;
     tillTime: string | undefined;
   },
@@ -77,18 +80,17 @@ function calucalteAvailableTimeSlots(
   const now = new Date();
 
   const availableFrom = parse(
-    `${date} ${dbAvailablity.fromTime}`,
+    `${date} ${dbAvailability.fromTime}`,
     "yyyy-MM-dd HH:mm",
     new Date()
   );
 
   const availableTill = parse(
-    `${date} ${dbAvailablity.tillTime}`,
+    `${date} ${dbAvailability.tillTime}`,
     "yyyy-MM-dd HH:mm",
     new Date()
   );
-
-  //@ts-ignore
+//@ts-ignore
   const busySlots = nylasData.data[0].timeSlots.map((slot) => ({
     start: fromUnixTime(slot.startTime),
     end: fromUnixTime(slot.endTime),
@@ -125,15 +127,18 @@ export async function TimeTable({
 }: iAppProps) {
   const { data, nylasCalendarData } = await getData(userName, selectedDate);
 
-  const formattedDate = format(selectedDate, "yyyy-MM-dd");
-  const dbAvailablity = {
+  const formattedDate = format(
+    toZonedTime(selectedDate, timeZone),
+    "yyyy-MM-dd"
+  );
+  const dbAvailability = {
     fromTime: data?.fromTime,
     tillTime: data?.tillTime,
   };
 
-  const availableSlots = calucalteAvailableTimeSlots(
+  const availableSlots = calculateAvailableTimeSlots(
     formattedDate,
-    dbAvailablity,
+    dbAvailability,
     nylasCalendarData,
     duration
   );
@@ -141,9 +146,9 @@ export async function TimeTable({
   return (
     <div>
       <p className="text-base font-semibold">
-        {format(selectedDate, "EEE")}{" "}
+        {format(toZonedTime(selectedDate, timeZone), "EEE")}{" "}
         <span className="text-sm text-muted-foreground">
-          {format(selectedDate, "MMM. d")}
+          {format(toZonedTime(selectedDate, timeZone), "MMM. d")}
         </span>
       </p>
 
