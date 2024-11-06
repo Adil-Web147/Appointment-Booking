@@ -17,7 +17,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { onboardingSchema } from "../lib/zodSchema";
 import { SubmitButton } from "../component/submitButton";
 
-export default function onboardingRoute() {
+export default function OnboardingRoute() {
   const [lastResult, action] = useFormState(onboardingAction, undefined);
   const [from, fields] = useForm({
     lastResult,
