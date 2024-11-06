@@ -11,14 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormState } from "react-dom";
-import { onboardingAction } from "../actions";
+import { OnboardingAction  } from "../actions";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { onboardingSchema } from "../lib/zodSchema";
 import { SubmitButton } from "../component/submitButton";
 
 export default function OnboardingRoute() {
-  const [lastResult, action] = useFormState(onboardingAction, undefined);
+  const [lastResult, action] = useFormState(OnboardingAction, undefined);
   const [from, fields] = useForm({
     lastResult,
 

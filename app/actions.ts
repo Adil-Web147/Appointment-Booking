@@ -16,7 +16,7 @@ import { error } from "console";
 
 
 // Onboarding Action
-export async function onboardingAction(prevState: any, formData: FormData) {
+export async function OnboardingAction(prevState: any, formData: FormData) {
   const session = await requireUser();
 
   const submission = await parseWithZod(formData, {

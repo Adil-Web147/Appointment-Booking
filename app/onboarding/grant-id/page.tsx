@@ -4,7 +4,7 @@ import VedioGif from "@/public/work-is-almost-over-happy.gif";
 import { CalendarCheck2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-export default function onboardingRouteTwo(){
+export default function OnboardingRouteTwo(){
 
     return(
         <div className="min-h-screen w-screen flex items-center justify-center">
